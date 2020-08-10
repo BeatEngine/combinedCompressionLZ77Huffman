@@ -76,6 +76,21 @@ class CodeTable
         }
     }
 
+    char* getFullData(size_t* returnSymbolsSize)
+    {
+        char* ret = (char*)malloc(length+resultSize);
+        memcpy(ret, symbols , length);
+        memcpy(ret+length, result , resultSize);
+        *returnSymbolsSize = length;
+        return ret;
+    }
+
+    void setSymbolsManuel(char* symbols_, int count)
+    {
+        symbols = (char*)realloc(symbols, count);
+        memcpy(this->symbols, symbols_, count);
+    }
+
     void compress(char* input, int inputSz)
     {
         result = (char*)calloc(inputSz+1, 1);
