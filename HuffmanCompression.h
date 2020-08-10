@@ -145,6 +145,65 @@ class CodeTable
         }
     }
 
+    void compress(FILE* input, long inputSz, FILE* output)
+    {
+        //result = (char*)calloc(inputSz+1, 1);
+        resultSize = inputSz+1;
+        fseek(input, 0, SEEK_SET);
+        int bitPointer = 0;
+        int biggest = 0;
+        unsigned char res = 0;
+        for(int i = 0; i < inputSz; i++)
+        {
+            char inputI = fgetc(input);
+            for(int s = 0; s < length; s++)
+            {
+                if(symbols[s] == inputI)
+                {
+                    bitPointer += s;
+                    int byte = bitPointer / 8;
+                    int bit = bitPointer - 8*byte;
+                    biggest = byte;
+                    res |= 1 << (bit);
+                    fputc((int)res, output);
+                    bitPointer++;
+                    break;
+                }
+            }
+        }
+        if(biggest < resultSize-1)
+        {
+            resultSize = biggest+1;
+        }
+    }
+
+    void decompress(FILE* input, long inputSz, FILE* output)
+    {
+        //char* res = (char*)calloc(1, resultSize*3);
+        int mxsz = resultSize*3;
+        int resSz = 0;
+        int bitPointer = 0;
+        int sigCounter = 0;
+        unsigned char resu = 0;
+        while (bitPointer < inputSz*8)
+        {
+            int byte = bitPointer / 8;
+            int bit = bitPointer - 8*byte;
+            if(bitPointer % 8 == 0)
+            {
+                resu = fgetc(input);
+            }
+            if(((resu >> bit) & 1) == 1)
+            {
+                resSz++;
+                fputc(symbols[sigCounter], output);
+                sigCounter = -1;
+            }
+            bitPointer++;
+            sigCounter++;
+        }
+    }
+
     char* decompress(int* returnSize)
     {
         char* res = (char*)calloc(1, resultSize*3);
@@ -356,6 +415,7 @@ CodeTable compress(char* data, int size, bool printWordBook)
 {
 
     std::vector<CompressionTableElement> wordBook;
+    
 
     for(int i = 0; i < size; i++)
     {
@@ -383,7 +443,7 @@ CodeTable compress(char* data, int size, bool printWordBook)
 
     std::sort(wordBook.begin(), wordBook.end(), CompressionTableElement::isless);
 
-    char* symbols = (char*)calloc(1 + wordBook.size(), sizeof(char));
+    char* symbols_ = (char*)calloc(1 + wordBook.size(), sizeof(char));
 
     for(int i = 0; i < wordBook.size(); i++)
     {
@@ -391,19 +451,120 @@ CodeTable compress(char* data, int size, bool printWordBook)
         {
             printf("%c(%d) ", wordBook.at(i).x, wordBook.at(i).count);
         }
-        symbols[i] = wordBook.at(i).x;
+        symbols_[i] = wordBook.at(i).x;
     }
     if(printWordBook)
     {
         printf("\n");
     }
     
-    CodeTable stuff(symbols, wordBook.size());
-    free(symbols);
+    CodeTable stuff(symbols_, wordBook.size());
+    free(symbols_);
 
     stuff.compress(data, size);
 
     return stuff;
+}
+
+long compressFile(char* inputFile, char* outputFile)
+{
+
+    FILE* input = fopen(inputFile, "rb");
+    FILE* output = fopen(outputFile, "wb");
+    fseek(input, 0, SEEK_END);
+    long size = ftell(input);
+    fseek(input, 0, SEEK_SET);
+    char* buffer = (char*)malloc(1024);
+    unsigned char* result = 0;
+    size_t resultSize = 0;
+    long p = 0;
+
+    std::vector<CompressionTableElement> wordBook;
+
+    long i = 0;
+    char dataI = 0;
+    int buffi;
+    int f;
+    while (p < size)
+    {
+        dataI = fgetc(input);
+        p++;
+        for(f = 0; f < wordBook.size(); f++)
+        {
+            if(wordBook.at(f).x == dataI)
+            {
+                break;
+            }
+        }
+        if(f == wordBook.size())
+        {
+            int count = 0;
+            fseek(input, 0, SEEK_SET);
+            for(int c = 0; c < size; c++)
+            {
+                if(dataI == fgetc(input))
+                {
+                    count++;
+                }
+            }
+            fseek(input, i, SEEK_SET);
+            wordBook.push_back(CompressionTableElement(dataI, count));
+        }
+    }
+
+    std::sort(wordBook.begin(), wordBook.end(), CompressionTableElement::isless);
+
+    char* symbols_ = (char*)calloc(1 + wordBook.size(), sizeof(char));
+    int symbs = wordBook.size();
+    fwrite(&symbs, sizeof(int), 1, output);
+    for(int i = 0; i < wordBook.size(); i++)
+    {
+        /*if(printWordBook)
+        {
+            printf("%c(%d) ", wordBook.at(i).x, wordBook.at(i).count);
+        }*/
+        symbols_[i] = wordBook.at(i).x;
+        fputc(symbols_[i], output);
+    }
+    /*if(printWordBook)
+    {
+        printf("\n");
+    }*/
+    CodeTable stuff(symbols_, wordBook.size());
+    free(symbols_);
+    stuff.compress(input, size, output);
+
+    free(buffer);
+    fclose(input);
+    fclose(output);
+}
+
+long decompressFile(char* inputFile, char* outputFile)
+{
+    FILE* input = fopen(inputFile, "rb");
+    FILE* output = fopen(outputFile, "wb");
+    fseek(input, 0, SEEK_END);
+    long size = ftell(input);
+    fseek(input, 0, SEEK_SET);
+    char* buffer = (char*)malloc(1024);
+    unsigned char* result = 0;
+    size_t resultSize = 0;
+    long p = 0;
+
+    int symbols = 0;
+    fread(&symbols, sizeof(int), 1, input);
+    buffer = (char*)realloc(buffer, symbols + 1);
+    buffer[symbols] = 0;
+    for(int i = 0; i < symbols; i++)
+    {
+        buffer[i] = fgetc(input);
+    }
+
+    CodeTable stuff(buffer, symbols);
+    stuff.decompress(input, size, output);
+    free(buffer);
+    fclose(input);
+    fclose(output);
 }
 
 std::vector<std::string> textToWordFragments(std::string& text)

@@ -9,7 +9,7 @@
 int main(int args, char** arg)
 {
 
-    char* text = "You have some kind of memory corruption bug, possibly nowhere near the code you showed us. Run your program under valgrind, fix the first invalid memory access it complains about (all subsequent complaints may just be.";
+    char* text = "D8FFPA2E3FFA7D0F1FFC1DEF5FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6FFC4E0F6";
 
     //CompressedDataLZW data;
 
@@ -32,7 +32,6 @@ int main(int args, char** arg)
     unsigned char* decompressed2 = CompressorLZ77Huffman::decompress2(compressed2, compressedSize2, symbols, &sizeDecompressed2);
     printf("Decompressed         : %.*s\n", sizeDecompressed2, decompressed2);
     int dbg = 1;
-
     return 0;
 }
 

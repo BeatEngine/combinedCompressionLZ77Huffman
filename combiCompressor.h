@@ -5,6 +5,28 @@
 
 class CompressorLZ77Huffman
 {
+
+    static char* generateTmpFile(char* file)
+    {
+        int l = strlen(file);
+        char* tmp = (char*)calloc(l + 10, 1);
+        
+        memcpy(tmp, file, l);
+        int p = l;
+        while (!(tmp[p] == '/' || tmp[p] == '\\'))
+        {
+            p--;
+        }
+        p++;
+        while(p < l-1)
+        {
+            tmp[p] = 65 + random() % 25;
+            p++;
+        }
+        tmp[l-1] = 0;
+        return tmp;
+    }
+
     public:
 
     static Huffmann::CodeTable compress(unsigned char* data, size_t size)
@@ -46,5 +68,25 @@ class CompressorLZ77Huffman
         free(decomp);
         return res;
     }
+
+
+    static void compressFile(char* inputFile, char* outputFile)
+    {
+        size_t compressedSize = 0;
+        char* tmpFile = generateTmpFile(outputFile);
+        LZWcompression::compressFile(inputFile, outputFile, &compressedSize);
+        //compressedSize = Huffmann::compressFile(tmpFile, outputFile);
+        remove(tmpFile);
+    }
+
+    static void decompressFile(char* inputFile, char* outputFile)
+    {
+        size_t compressedSize = 0;
+        char* tmpFile = generateTmpFile(outputFile);
+        //compressedSize = Huffmann::decompressFile(inputFile, tmpFile);
+        LZWcompression::decompressFile(inputFile, outputFile, &compressedSize);
+        remove(tmpFile);
+    }
+
 };
 
