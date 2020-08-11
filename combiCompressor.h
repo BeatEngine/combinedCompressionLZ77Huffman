@@ -75,7 +75,7 @@ class CompressorLZ77Huffman
         size_t compressedSize = 0;
         char* tmpFile = generateTmpFile(outputFile);
         LZWcompression::compressFile(inputFile, outputFile, &compressedSize);
-        //compressedSize = Huffmann::compressFile(tmpFile, outputFile);
+        //compressedSize = Huffmann::compressFile(inputFile, outputFile);
         remove(tmpFile);
     }
 
@@ -83,7 +83,7 @@ class CompressorLZ77Huffman
     {
         size_t compressedSize = 0;
         char* tmpFile = generateTmpFile(outputFile);
-        //compressedSize = Huffmann::decompressFile(inputFile, tmpFile);
+        //compressedSize = Huffmann::decompressFile(inputFile, outputFile);
         LZWcompression::decompressFile(inputFile, outputFile, &compressedSize);
         remove(tmpFile);
     }

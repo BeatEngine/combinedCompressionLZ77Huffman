@@ -471,9 +471,9 @@ long compressFile(char* inputFile, char* outputFile)
 
     FILE* input = fopen(inputFile, "rb");
     FILE* output = fopen(outputFile, "wb");
-    fseek(input, 0, SEEK_END);
+    fseek(input, 0L, SEEK_END);
     long size = ftell(input);
-    fseek(input, 0, SEEK_SET);
+    fseek(input, 0L, SEEK_SET);
     char* buffer = (char*)malloc(1024);
     unsigned char* result = 0;
     size_t resultSize = 0;

@@ -31,6 +31,7 @@ int main(int args, char** arg)
     size_t sizeDecompressed2 = 0;
     unsigned char* decompressed2 = CompressorLZ77Huffman::decompress2(compressed2, compressedSize2, symbols, &sizeDecompressed2);
     printf("Decompressed         : %.*s\n", sizeDecompressed2, decompressed2);
+
     int dbg = 1;
     return 0;
 }
