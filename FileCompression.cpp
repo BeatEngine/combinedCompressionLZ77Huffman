@@ -9,9 +9,9 @@
 int main(int args, char** arg)
 {
 
-    CompressorLZ77Huffman::compressFile("/home/david/Dokumente/StructCompression/test.bmp", "/home/david/Dokumente/StructCompression/test.lz77h");
+    CompressorLZ77Huffman::compressFile("/home/david/Dokumente/StructCompression/test.txt", "/home/david/Dokumente/StructCompression/test.lz77h");
 
-    CompressorLZ77Huffman::decompressFile("/home/david/Dokumente/StructCompression/test.lz77h", "/home/david/Dokumente/StructCompression/decompressed.bmp");
+    CompressorLZ77Huffman::decompressFile("/home/david/Dokumente/StructCompression/test.lz77h", "/home/david/Dokumente/StructCompression/decompressed.txt");
 
 return 0;
 }

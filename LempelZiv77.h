@@ -194,16 +194,16 @@ class LZWcompression
                 memset(buffer, 0, 256);
                 tp = fread(buffer, 1, size - p, input);
                 result = compress((char*)buffer, tp, &resultSize);
-                for(int i = 0; i + 1 < resultSize; i+=2)
+                /*for(int i = 0; i + 1 < resultSize; i+=2)
                 {
                     printf("(%u|%u)", (unsigned int)result[i], (unsigned int)result[i+1]);
                 }
-                printf("\n\n");
+                printf("\n\n");*/
                 p += tp;
             }
             else
             {
-                tp = fread(buffer, 1, 256, input);
+                tp = fread(buffer, 1, 255, input);
                 result = compress((char*)buffer, tp, &resultSize);
                 p += tp;
             }
@@ -240,11 +240,11 @@ class LZWcompression
             {
                 memset(buffer, 0, 256);
                 tp = fread(buffer, 1, size - p, input);
-                for(int i = 0; i + 1 < tp; i+=2)
+                /*for(int i = 0; i + 1 < tp; i+=2)
                 {
                     printf("(%u|%u)", (unsigned int)buffer[i], (unsigned int)buffer[i+1]);
                 }
-                printf("\n");
+                printf("\n");*/
                 result = (unsigned char*)decompress((unsigned char*)buffer, tp, &resultSize, lastResult, lastResultSize);
                 p += tp;
             }
